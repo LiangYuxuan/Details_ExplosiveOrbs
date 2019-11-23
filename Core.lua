@@ -5,6 +5,22 @@ local L = Engine.L
 Engine.Core = EO
 _G[addon] = Engine
 
+-- Lua functions
+local _G = _G
+local format, ipairs, min, pairs, select, strsplit, tonumber = format, ipairs, min, pairs, select, strsplit, tonumber
+
+-- WoW API / Variables
+local C_ChallengeMode_GetActiveKeystoneInfo = C_ChallengeMode.GetActiveKeystoneInfo
+local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
+local CreateFrame = CreateFrame
+local UnitGUID = UnitGUID
+
+local tContains = tContains
+
+local Details = _G.Details
+
+-- GLOBALS: ExplosiveOrbsLog
+
 EO.debug = false
 EO.orbID = '120651' -- Explosive
 EO.CustomDisplay = {
@@ -79,7 +95,7 @@ EO.CustomDisplay = {
     ]],
     total_script = [[
         local value, top, total, Combat, Instance, Actor = ...
-    
+
         if _G.Details_ExplosiveOrbs then
             return _G.Details_ExplosiveOrbs:GetDisplayText(Combat:GetCombatNumber(), Actor.my_actor.serial)
         end
@@ -172,7 +188,7 @@ function EO:RecordHit(unitGUID, targetGUID)
 end
 
 function EO:CheckAffix()
-    local affix = select(2, C_ChallengeMode.GetActiveKeystoneInfo())
+    local affix = select(2, C_ChallengeMode_GetActiveKeystoneInfo())
     if affix and tContains(affix, 13) then
         self:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
         for index, frame in ipairs(self.eventFrames) do
@@ -279,7 +295,7 @@ function EO:OnDetailsEvent(event, combat)
     elseif event == 'COMBAT_PLAYER_LEAVE' then
         EO.current = combat:GetCombatNumber()
         EO:Debug("COMBAT_PLAYER_LEAVE: %s", EO.current)
-    
+
         if not EO.current or not EO.db[EO.current] then return end
         for _, list in pairs(EO.db[EO.current]) do
             for key in pairs(list) do
@@ -295,10 +311,10 @@ function EO:OnDetailsEvent(event, combat)
 end
 
 function EO:LoadHooks()
-    self:SecureHook(DetailsMythicPlusFrame, 'MergeSegmentsOnEnd')
-    self:SecureHook(DetailsMythicPlusFrame, 'MergeTrashCleanup')
-    self:SecureHook(DetailsMythicPlusFrame, 'MergeRemainingTrashAfterAllBossesDone')
-    
+    self:SecureHook(_G.DetailsMythicPlusFrame, 'MergeSegmentsOnEnd')
+    self:SecureHook(_G.DetailsMythicPlusFrame, 'MergeTrashCleanup')
+    self:SecureHook(_G.DetailsMythicPlusFrame, 'MergeRemainingTrashAfterAllBossesDone')
+
     self.EventListener = Details:CreateEventListener()
     self.EventListener:RegisterEvent('COMBAT_PLAYER_ENTER')
     self.EventListener:RegisterEvent('COMBAT_PLAYER_LEAVE')
