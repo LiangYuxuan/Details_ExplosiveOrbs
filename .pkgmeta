@@ -1,0 +1,6 @@
+package-as: Details_ExplosiveOrbs
+
+ignore:
+  - .luacheckrc
+  - babelfish_config.lua
+  - README.md
