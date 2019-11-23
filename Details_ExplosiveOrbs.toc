@@ -4,6 +4,8 @@
 ## RequiredDeps: Details
 ## Author: @project-author@
 ## Version: @project-version@
+## X-License: MIT
+## X-Curse-Project-ID: 352367
 ## SavedVariablesPerCharacter: ExplosiveOrbsLog
 
 Locale.lua
