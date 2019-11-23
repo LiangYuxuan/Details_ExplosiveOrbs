@@ -1,7 +1,6 @@
 local _, Engine = ...
 
 -- Lua functions
-local _G = _G
 local rawget = rawget
 
 -- WoW API / Variables
