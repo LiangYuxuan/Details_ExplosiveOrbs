@@ -8,7 +8,7 @@
 ## X-Curse-Project-ID: 352367
 ## SavedVariablesPerCharacter: ExplosiveOrbsLog
 
-Libs/Load_Libs.xml
+Libs\Load_Libs.xml
 
 Locale.lua
 Core.lua
