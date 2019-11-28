@@ -190,11 +190,13 @@ end
 function EO:CheckAffix()
     local affix = select(2, C_ChallengeMode_GetActiveKeystoneInfo())
     if affix and tContains(affix, 13) then
+        self:Debug("Explosive active")
         self:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
         for index, frame in ipairs(self.eventFrames) do
             frame:RegisterUnitEvent('UNIT_TARGET', index == 5 and 'player' or ('party' .. index))
         end
     else
+        self:Debug("Explosive inactive")
         self:UnregisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
         for _, frame in ipairs(self.eventFrames) do
             frame:UnregisterEvent('UNIT_TARGET')
