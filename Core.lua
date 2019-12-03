@@ -252,8 +252,10 @@ function EO:MergeTrashCleanup()
             minCombat = minCombat and min(minCombat, combatID) or combatID
         end
 
-        for i = minCombat, base - 1 do
-            self:MergeCombat(base, i)
+        if minCombat then
+            for i = minCombat, base - 1 do
+                self:MergeCombat(base, i)
+            end
         end
     end
 
