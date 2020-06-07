@@ -233,10 +233,24 @@ end
 function EO:MergeSegmentsOnEnd()
     self:Debug("on Details MergeSegmentsOnEnd")
 
-    local overall = Details:GetCombat(1):GetCombatNumber()
+    -- at the end of a Mythic+ Dungeon
+    -- Details Combat:
+    -- n+1 - other combat
+    -- n   - first combat
+    -- ...
+    -- 3   - combat (likely final boss trash)
+    -- 2   - combat (likely final boss)
+    -- 1   - overall combat
+
+    local overallCombat = Details:GetCombat(1)
+    local overall = overallCombat:GetCombatNumber()
+    local runID = select(2, overallCombat:IsMythicDungeon())
     for i = 2, 25 do
         local combat = Details:GetCombat(i)
-        if not combat or not combat:IsMythicDungeon() or combat:IsMythicDungeonOverall() then break end
+        if not combat then break end
+
+        local combatRunID = select(2, combat:IsMythicDungeon())
+        if not combatRunID or combatRunID ~= runID then break end
 
         self:MergeCombat(overall, combat:GetCombatNumber())
     end
@@ -247,9 +261,21 @@ end
 function EO:MergeTrashCleanup()
     self:Debug("on Details MergeTrashCleanup")
 
+    -- after boss fight
+    -- Details Combat:
+    -- 3   - other combat
+    -- 2   - boss trash combat
+    -- 1   - boss combat
+
+    local runID = select(2, Details:GetCombat(1):IsMythicDungeon())
+
     local baseCombat = Details:GetCombat(2)
+    -- killed boss before any combat
+    if not baseCombat then return end
+
+    local baseCombatRunID = select(2, baseCombat:IsMythicDungeon())
     -- killed boss before any trash combats
-    if not baseCombat or not baseCombat:IsMythicDungeon() or baseCombat:IsMythicDungeonOverall() then return end
+    if not baseCombatRunID or baseCombatRunID ~= runID then return end
 
     local base = baseCombat:GetCombatNumber()
     local prevCombat = Details:GetCombat(3)
@@ -259,14 +285,10 @@ function EO:MergeTrashCleanup()
             self:MergeCombat(base, i)
         end
     else
-        local minCombat
-        for combatID in pairs(self.db) do
-            minCombat = minCombat and min(minCombat, combatID) or combatID
-        end
-
-        if minCombat then
-            for i = minCombat, base - 1 do
-                self:MergeCombat(base, i)
+        -- fail to find other combat, merge all combat with same run id in database
+        for combatID, data in pairs(self.db) do
+            if data.runID and data.runID == runID then
+                self:MergeCombat(base, combatID)
             end
         end
     end
@@ -276,6 +298,13 @@ end
 
 function EO:MergeRemainingTrashAfterAllBossesDone()
     self:Debug("on Details MergeRemainingTrashAfterAllBossesDone")
+
+    -- before the end of a Mythic+ Dungeon, and finish all trash after final boss fight
+    -- Details Combat:
+    -- 3   - prev boss combat
+    -- 2   - final boss trash combat
+    -- 1   - final boss combat
+    -- current combat is removed
 
     local prevTrash = Details:GetCombat(2)
     if prevTrash then
@@ -330,6 +359,7 @@ function EO:OnDetailsEvent(event, combat)
                 end
             end
         end
+        EO.db[EO.current].runID = select(2, combat:IsMythicDungeon())
     elseif event == 'DETAILS_DATA_RESET' then
         EO:Debug("DETAILS_DATA_RESET")
         self.overall = Details:GetCombat(-1):GetCombatNumber()
