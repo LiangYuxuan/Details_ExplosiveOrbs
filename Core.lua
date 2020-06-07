@@ -169,6 +169,12 @@ function EO:RecordTarget(unitGUID, targetGUID)
     if self.db[self.current][unitGUID][targetGUID] ~= 1 and self.db[self.current][unitGUID][targetGUID] ~= 3 then
         self.db[self.current][unitGUID][targetGUID] = self.db[self.current][unitGUID][targetGUID] + 1
         self.db[self.current][unitGUID].target = (self.db[self.current][unitGUID].target or 0) + 1
+
+        -- update overall
+        if not self.db[self.overall] then self.db[self.overall] = {} end
+        if not self.db[self.overall][unitGUID] then self.db[self.overall][unitGUID] = {} end
+
+        self.db[self.overall][unitGUID].target = (self.db[self.overall][unitGUID].target or 0) + 1
     end
 end
 
@@ -184,6 +190,12 @@ function EO:RecordHit(unitGUID, targetGUID)
     if self.db[self.current][unitGUID][targetGUID] ~= 2 and self.db[self.current][unitGUID][targetGUID] ~= 3 then
         self.db[self.current][unitGUID][targetGUID] = self.db[self.current][unitGUID][targetGUID] + 2
         self.db[self.current][unitGUID].hit = (self.db[self.current][unitGUID].hit or 0) + 1
+
+        -- update overall
+        if not self.db[self.overall] then self.db[self.overall] = {} end
+        if not self.db[self.overall][unitGUID] then self.db[self.overall][unitGUID] = {} end
+
+        self.db[self.overall][unitGUID].hit = (self.db[self.overall][unitGUID].hit or 0) + 1
     end
 end
 
@@ -274,8 +286,18 @@ function EO:MergeRemainingTrashAfterAllBossesDone()
     self:CleanDiscardCombat()
 end
 
+function EO:ResetOverall()
+    self:Debug("on Details Reset Overall (Details.historico.resetar_overall)")
+
+    if self.overall and self.db[self.overall] then
+        self.db[self.overall] = nil
+    end
+    self.overall = Details:GetCombat(-1):GetCombatNumber()
+end
+
 function EO:CleanDiscardCombat()
     local remain = {}
+    remain[self.overall] = true
 
     for i = 1, 25 do
         local combat = Details:GetCombat(i)
@@ -310,6 +332,7 @@ function EO:OnDetailsEvent(event, combat)
         end
     elseif event == 'DETAILS_DATA_RESET' then
         EO:Debug("DETAILS_DATA_RESET")
+        self.overall = Details:GetCombat(-1):GetCombatNumber()
         EO:CleanDiscardCombat()
     end
 end
@@ -318,6 +341,9 @@ function EO:LoadHooks()
     self:SecureHook(_G.DetailsMythicPlusFrame, 'MergeSegmentsOnEnd')
     self:SecureHook(_G.DetailsMythicPlusFrame, 'MergeTrashCleanup')
     self:SecureHook(_G.DetailsMythicPlusFrame, 'MergeRemainingTrashAfterAllBossesDone')
+
+    self:SecureHook(Details.historico, 'resetar_overall', 'ResetOverall')
+    self.overall = Details:GetCombat(-1):GetCombatNumber()
 
     self.EventListener = Details:CreateEventListener()
     self.EventListener:RegisterEvent('COMBAT_PLAYER_ENTER')
