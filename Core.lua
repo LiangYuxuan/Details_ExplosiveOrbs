@@ -7,7 +7,7 @@ _G[addon] = Engine
 
 -- Lua functions
 local _G = _G
-local format, ipairs, min, pairs, select, strsplit, tonumber = format, ipairs, min, pairs, select, strsplit, tonumber
+local format, ipairs, pairs, select, strsplit, tonumber = format, ipairs, pairs, select, strsplit, tonumber
 
 -- WoW API / Variables
 local C_ChallengeMode_GetActiveKeystoneInfo = C_ChallengeMode.GetActiveKeystoneInfo
