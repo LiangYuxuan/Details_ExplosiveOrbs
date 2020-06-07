@@ -205,7 +205,8 @@ function EO:CheckAffix()
         self:Debug("Explosive active")
         self:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
         for index, frame in ipairs(self.eventFrames) do
-            frame:RegisterUnitEvent('UNIT_TARGET', index == 5 and 'player' or ('party' .. index))
+            local unitID = index == 5 and 'player' or ('party' .. index)
+            frame:RegisterUnitEvent('UNIT_TARGET', unitID, unitID .. 'pet')
         end
     else
         self:Debug("Explosive inactive")
