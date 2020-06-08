@@ -8,6 +8,7 @@ _G[addon] = Engine
 -- Lua functions
 local _G = _G
 local format, ipairs, pairs, select, strsplit, tonumber = format, ipairs, pairs, select, strsplit, tonumber
+local bit_band = bit.band
 
 -- WoW API / Variables
 local C_ChallengeMode_GetActiveKeystoneInfo = C_ChallengeMode.GetActiveKeystoneInfo
@@ -16,6 +17,8 @@ local CreateFrame = CreateFrame
 local UnitGUID = UnitGUID
 
 local tContains = tContains
+
+local COMBATLOG_OBJECT_TYPE_PET = COMBATLOG_OBJECT_TYPE_PET
 
 local Details = _G.Details
 
@@ -32,7 +35,7 @@ EO.CustomDisplay = {
     target = false,
     author = "Rhythm",
     desc = L["Show how many explosive orbs players target and hit."],
-    script_version = 2,
+    script_version = 3,
     script = [[
         local Combat, CustomContainer, Instance = ...
         local total, top, amount = 0, 0, 0
@@ -44,12 +47,6 @@ EO.CustomDisplay = {
                 if Actor:IsGroupPlayer() then
                     -- we only record the players in party
                     local target, hit = _G.Details_ExplosiveOrbs:GetRecord(CombatNumber, Actor:guid())
-                    for _, petName in ipairs(Actor.pets) do
-                        local petActor = Container:GetActor(petName)
-                        local petTarget, petHit = _G.Details_ExplosiveOrbs:GetRecord(CombatNumber, petActor:guid())
-                        target = target + petTarget
-                        hit = hit + petHit
-                    end
                     if target > 0 or hit > 0 then
                         CustomContainer:AddValue(Actor, hit)
                     end
@@ -109,17 +106,7 @@ EO.CustomDisplay = {
         local value, top, total, Combat, Instance, Actor = ...
 
         if _G.Details_ExplosiveOrbs then
-            local CombatNumber = Combat:GetCombatNumber()
-            local Container = Combat:GetContainer(DETAILS_ATTRIBUTE_MISC)
-            local target, hit = _G.Details_ExplosiveOrbs:GetRecord(CombatNumber, Actor.my_actor:guid())
-            for _, petName in ipairs(Actor.my_actor.pets) do
-                local petActor = Container:GetActor(petName)
-                local petTarget, petHit = _G.Details_ExplosiveOrbs:GetRecord(CombatNumber, petActor:guid())
-                target = target + petTarget
-                hit = hit + petHit
-            end
-
-            return _G.Details_ExplosiveOrbs:FormatDisplayText(target, hit)
+            return _G.Details_ExplosiveOrbs:GetDisplayText(Combat:GetCombatNumber(), Actor.my_actor:guid())
         end
         return ""
     ]],
@@ -134,7 +121,6 @@ function Engine:GetRecord(combatID, playerGUID)
     return 0, 0
 end
 
--- Deprecated
 function Engine:GetDisplayText(combatID, playerGUID)
     if EO.db[combatID] and EO.db[combatID][playerGUID] then
         return L["Target: "] .. (EO.db[combatID][playerGUID].target or 0) .. " " .. L["Hit: "] .. (EO.db[combatID][playerGUID].hit or 0)
@@ -161,24 +147,43 @@ function EO:Debug(...)
     end
 end
 
-local function targetChanged(_, _, unitID)
+local function targetChanged(self, _, unitID)
     local targetGUID = UnitGUID(unitID .. 'target')
     if not targetGUID then return end
 
     local npcID = select(6, strsplit('-', targetGUID))
     if npcID == EO.orbID then
-        EO:RecordTarget(UnitGUID(unitID), targetGUID)
+        -- record pet's target to its owner
+        EO:RecordTarget(UnitGUID(self.unitID), targetGUID)
     end
 end
 
 function EO:COMBAT_LOG_EVENT_UNFILTERED()
-    local _, subEvent, _, sourceGUID, _, _, _, destGUID = CombatLogGetCurrentEventInfo()
+    local _, subEvent, _, sourceGUID, sourceName, sourceFlag, _, destGUID = CombatLogGetCurrentEventInfo()
     if (
         subEvent == 'SPELL_DAMAGE' or subEvent == 'RANGE_DAMAGE' or subEvent == 'SWING_DAMAGE' or
         subEvent == 'SPELL_PERIODIC_DAMAGE' or subEvent == 'SPELL_BUILDING_DAMAGE'
     ) then
         local npcID = select(6, strsplit('-', destGUID))
         if npcID == self.orbID then
+            if bit_band(sourceFlag, COMBATLOG_OBJECT_TYPE_PET) > 0 then
+                -- source is pet, don't track guardian which is automaton
+                local Combat = Details:GetCombat(0)
+                if Combat then
+                    local Container = Combat:GetContainer(_G.DETAILS_ATTRIBUTE_DAMAGE)
+                    local ownerActor = select(2, Container:PegarCombatente(sourceGUID, sourceName, sourceFlag, true))
+                    if ownerActor then
+                        -- Details implements two cache method of pet and its owner,
+                        -- one is in parser which is shared inside parser (damage_cache_petsOwners),
+                        -- it will be wiped in :ClearParserCache, but I have no idea when,
+                        -- the other is in container,
+                        -- which :PegarCombatente will try to fetch owner from it first,
+                        -- so in this case, simply call :PegarCombatente and use its cache,
+                        -- and no need to implement myself like parser
+                        sourceGUID = ownerActor:guid()
+                    end
+                end
+            end
             EO:RecordHit(sourceGUID, destGUID)
         end
     end
@@ -231,9 +236,8 @@ function EO:CheckAffix()
     if affix and tContains(affix, 13) then
         self:Debug("Explosive active")
         self:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
-        for index, frame in ipairs(self.eventFrames) do
-            local unitID = index == 5 and 'player' or ('party' .. index)
-            frame:RegisterUnitEvent('UNIT_TARGET', unitID, unitID .. 'pet')
+        for _, frame in ipairs(self.eventFrames) do
+            frame:RegisterUnitEvent('UNIT_TARGET', frame.unitID, frame.unitID .. 'pet')
         end
     else
         self:Debug("Explosive inactive")
@@ -423,6 +427,7 @@ function EO:OnInitialize()
     for i = 1, 5 do
         self.eventFrames[i] = CreateFrame('frame')
         self.eventFrames[i]:SetScript('OnEvent', targetChanged)
+        self.eventFrames[i].unitID = (i == 5 and 'player' or ('party' .. i))
     end
 
     self:RegisterEvent('PLAYER_ENTERING_WORLD', 'CheckAffix')
