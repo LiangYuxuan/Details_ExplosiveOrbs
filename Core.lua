@@ -35,7 +35,7 @@ EO.CustomDisplay = {
     target = false,
     author = "Rhythm",
     desc = L["Show how many explosive orbs players target and hit."],
-    script_version = 3,
+    script_version = 4,
     script = [[
         local Combat, CustomContainer, Instance = ...
         local total, top, amount = 0, 0, 0
@@ -64,6 +64,10 @@ EO.CustomDisplay = {
         local GameCooltip = GameCooltip
 
         if _G.Details_ExplosiveOrbs then
+            local actorName = Actor:name()
+            local Actor = Combat:GetContainer(DETAILS_ATTRIBUTE_DAMAGE):GetActor(actorName)
+            if not Actor then return end
+
             local sortedList = {}
             local orbName = _G.Details_ExplosiveOrbs:RequireOrbName()
             local Container = Combat:GetContainer(DETAILS_ATTRIBUTE_DAMAGE)
