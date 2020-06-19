@@ -320,7 +320,9 @@ function EO:MergeTrashCleanup()
     if prevCombat then
         local prev = prevCombat:GetCombatNumber()
         for i = prev + 1, base - 1 do
-            self:MergeCombat(base, i)
+            if i ~= self.overall then
+                self:MergeCombat(base, i)
+            end
         end
     else
         -- fail to find other combat, merge all combat with same run id in database
