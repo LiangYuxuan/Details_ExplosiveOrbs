@@ -1,4 +1,4 @@
-## Interface: 80300
+## Interface: 90001
 ## Title: Details!: Explosive Orbs (plugin)
 ## Notes: Show how many explosive orbs players target and hit.
 ## RequiredDeps: Details
