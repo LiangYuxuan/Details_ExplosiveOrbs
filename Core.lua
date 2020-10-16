@@ -441,5 +441,5 @@ function EO:OnInitialize()
     self:RegisterEvent('PLAYER_ENTERING_WORLD', 'CheckAffix')
     self:RegisterEvent('CHALLENGE_MODE_START', 'CheckAffix')
 
-    self:SecureHook(Details, 'Start', 'LoadHooks')
+    self:SecureHook(Details, 'StartMeUp', 'LoadHooks')
 end
