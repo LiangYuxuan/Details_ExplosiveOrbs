@@ -355,8 +355,8 @@ function EO:MergeRemainingTrashAfterAllBossesDone()
     self:CleanDiscardCombat()
 end
 
-function EO:ResetOverall()
-    self:Debug("on Details Reset Overall (Details.historico.resetar_overall)")
+function EO:OnResetOverall()
+    self:Debug("on Details Reset Overall")
 
     if self.overall and self.db[self.overall] then
         self.db[self.overall] = nil
@@ -412,7 +412,15 @@ function EO:LoadHooks()
     self:SecureHook(_G.DetailsMythicPlusFrame, 'MergeTrashCleanup')
     self:SecureHook(_G.DetailsMythicPlusFrame, 'MergeRemainingTrashAfterAllBossesDone')
 
-    self:SecureHook(Details.historico, 'resetar_overall', 'ResetOverall')
+    local originResetOverall = Details.historico.resetar_overall
+    Details.historico.resetar_overall = function(...)
+        originResetOverall(...)
+
+        EO:OnResetOverall()
+    end
+    if Details.tabela_historico then
+        self:SecureHook(Details.tabela_historico, 'resetar_overall', 'OnResetOverall')
+    end
     self.overall = Details:GetCombat(-1):GetCombatNumber()
 
     self.EventListener = Details:CreateEventListener()
