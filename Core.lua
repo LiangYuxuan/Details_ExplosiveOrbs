@@ -7,7 +7,7 @@ _G[addon] = Engine
 
 -- Lua functions
 local _G = _G
-local format, ipairs, pairs, select, strsplit, tonumber, type = format, ipairs, pairs, select, strsplit, tonumber, type
+local format, ipairs, pairs, select, strmatch, tonumber, type = format, ipairs, pairs, select, strmatch, tonumber, type
 local bit_band = bit.band
 
 -- WoW API / Variables
