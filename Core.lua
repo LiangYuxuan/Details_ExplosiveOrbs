@@ -406,7 +406,7 @@ function EO:OnDetailsEvent(event, combat)
         EO.db[EO.current].runID = select(2, combat:IsMythicDungeon())
     elseif event == 'DETAILS_DATA_RESET' then
         EO:Debug("DETAILS_DATA_RESET")
-        self.overall = Details:GetCombat(-1):GetCombatNumber()
+        EO.overall = Details:GetCombat(-1):GetCombatNumber()
         EO:CleanDiscardCombat()
     end
 end
