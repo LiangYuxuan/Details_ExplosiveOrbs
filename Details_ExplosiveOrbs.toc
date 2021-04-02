@@ -4,9 +4,11 @@
 ## RequiredDeps: Details
 ## Author: @project-author@
 ## Version: @project-version@
+## SavedVariablesPerCharacter: ExplosiveOrbsLog
 ## X-License: MIT
 ## X-Curse-Project-ID: 352367
-## SavedVariablesPerCharacter: ExplosiveOrbsLog
+## X-WoWI-ID: 25932
+## X-Wago-ID: ZQ6aXANW
 
 Libs\Load_Libs.xml
 
