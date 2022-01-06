@@ -15,6 +15,11 @@ jobs:
           args: "--no-color -q"
           annotate: warning
 
+      - name: Find globals
+        uses: LiangYuxuan/action-findglobals@v1
+        with:
+          find-args: "! -path \"./Libs/*\""
+
       - name: Create Retail Package
         uses: BigWigsMods/packager@master
         with:
