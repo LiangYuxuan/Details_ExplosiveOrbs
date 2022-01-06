@@ -1,4 +1,4 @@
-name: pull-request-build
+name: Build pull request
 
 on: [pull_request]
 
