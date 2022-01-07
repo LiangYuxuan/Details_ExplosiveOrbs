@@ -2,8 +2,7 @@ std = "lua51"
 max_line_length = false
 exclude_files = {
 	"Libs/",
-	"Scripts/",
-	".luacheckrc"
+	"babelfish_config.lua",
 }
 ignore = {
 	"11./SLASH_.*", -- Setting an undefined (Slash handler) global variable
@@ -12,12 +11,6 @@ ignore = {
 	-- "113/NUM_LE_.*", -- Accessing an undefined (Lua ENUM type) global variable
 	"122/StaticPopupDialogs", -- Setting a read-only field of a global variable "StaticPopupDialogs"
 	-- "211", -- Unused local variable
-	"211/R", -- Unused local variable "R"
-	"211/E", -- Unused local variable "E"
-	"211/L", -- Unused local variable "L"
-	"211/V", -- Unused local variable "V"
-	"211/P", -- Unused local variable "P"
-	"211/G", -- Unused local variable "G"
 	-- "212", -- Unused argument
 	"212/self", -- Unused argument "self"
 	-- "213", -- Unused loop variable
