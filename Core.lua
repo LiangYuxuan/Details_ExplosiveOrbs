@@ -243,6 +243,184 @@ EO.CustomDisplayOverall = {
         return ""
     ]],
 }
+EO.CustomDisplayNumbers = {
+    name = L["Explosive Orbs only Nubers"],
+    icon = 2175503,
+    source = false,
+    attribute = false,
+    spellid = false,
+    target = false,
+    author = "Rhythm",
+    desc = L["Show how many explosive orbs players target and hit."],
+    script_version = 11,
+    script = [[
+        local Combat, CustomContainer, Instance = ...
+        local total, top, amount = 0, 0, 0
+
+        if _G.Details_ExplosiveOrbs then
+            local CombatNumber = Combat:GetCombatNumber()
+            local Container = Combat:GetContainer(DETAILS_ATTRIBUTE_DAMAGE)
+            for _, Actor in Container:ListActors() do
+                if Actor:IsGroupPlayer() then
+                    -- we only record the players in party
+                    local target, hit = _G.Details_ExplosiveOrbs:GetRecord(CombatNumber, Actor:guid())
+                    if target > 0 or hit > 0 then
+                        CustomContainer:AddValue(Actor, hit)
+                    end
+                end
+            end
+
+            total, top = CustomContainer:GetTotalAndHighestValue()
+            amount = CustomContainer:GetNumActors()
+        end
+
+        return total, top, amount
+    ]],
+    tooltip = [[
+        local Actor, Combat, Instance = ...
+        local GameCooltip = GameCooltip
+
+        if _G.Details_ExplosiveOrbs then
+            local actorName = Actor:name()
+            local Actor = Combat:GetContainer(DETAILS_ATTRIBUTE_DAMAGE):GetActor(actorName)
+            if not Actor then return end
+
+            local sortedList = {}
+            local orbName = _G.Details_ExplosiveOrbs:RequireOrbName()
+            local Container = Combat:GetContainer(DETAILS_ATTRIBUTE_DAMAGE)
+
+            for spellID, spellTable in pairs(Actor:GetSpellList()) do
+                local amount = spellTable.targets[orbName]
+                if amount then
+                    tinsert(sortedList, {spellID, amount})
+                end
+            end
+
+            -- handle pet
+            for _, petName in ipairs(Actor.pets) do
+                local petActor = Container:GetActor(petName)
+                for spellID, spellTable in pairs(petActor:GetSpellList()) do
+                    local amount = spellTable.targets[orbName]
+                    if amount then
+                        tinsert(sortedList, {spellID, amount, petName})
+                    end
+                end
+            end
+
+            sort(sortedList, Details.Sort2)
+
+            local format_func = Details:GetCurrentToKFunction()
+            for _, tbl in ipairs(sortedList) do
+                local spellID, amount, petName = unpack(tbl)
+                local spellName, _, spellIcon = Details.GetSpellInfo(spellID)
+                if petName then
+                    spellName = spellName .. ' (' .. petName .. ')'
+                end
+
+                GameCooltip:AddLine(spellName, format_func(_, amount))
+                Details:AddTooltipBackgroundStatusbar()
+                GameCooltip:AddIcon(spellIcon, 1, 1, _detalhes.tooltip.line_height, _detalhes.tooltip.line_height)
+            end
+        end
+    ]],
+    total_script = [[
+        local value, top, total, Combat, Instance, Actor = ...
+
+        if _G.Details_ExplosiveOrbs then
+            return _G.Details_ExplosiveOrbs:GetDisplayTextNumbers(Combat:GetCombatNumber(), Actor.my_actor:guid())
+        end
+        return ""
+    ]],
+}
+EO.CustomDisplayHit = {
+    name = L["Explosive Orbs only Hits"],
+    icon = 2175503,
+    source = false,
+    attribute = false,
+    spellid = false,
+    target = false,
+    author = "Rhythm",
+    desc = L["Show how many explosive orbs players target and hit."],
+    script_version = 11,
+    script = [[
+        local Combat, CustomContainer, Instance = ...
+        local total, top, amount = 0, 0, 0
+
+        if _G.Details_ExplosiveOrbs then
+            local CombatNumber = Combat:GetCombatNumber()
+            local Container = Combat:GetContainer(DETAILS_ATTRIBUTE_DAMAGE)
+            for _, Actor in Container:ListActors() do
+                if Actor:IsGroupPlayer() then
+                    -- we only record the players in party
+                    local target, hit = _G.Details_ExplosiveOrbs:GetRecord(CombatNumber, Actor:guid())
+                    if target > 0 or hit > 0 then
+                        CustomContainer:AddValue(Actor, hit)
+                    end
+                end
+            end
+
+            total, top = CustomContainer:GetTotalAndHighestValue()
+            amount = CustomContainer:GetNumActors()
+        end
+
+        return total, top, amount
+    ]],
+    tooltip = [[
+        local Actor, Combat, Instance = ...
+        local GameCooltip = GameCooltip
+
+        if _G.Details_ExplosiveOrbs then
+            local actorName = Actor:name()
+            local Actor = Combat:GetContainer(DETAILS_ATTRIBUTE_DAMAGE):GetActor(actorName)
+            if not Actor then return end
+
+            local sortedList = {}
+            local orbName = _G.Details_ExplosiveOrbs:RequireOrbName()
+            local Container = Combat:GetContainer(DETAILS_ATTRIBUTE_DAMAGE)
+
+            for spellID, spellTable in pairs(Actor:GetSpellList()) do
+                local amount = spellTable.targets[orbName]
+                if amount then
+                    tinsert(sortedList, {spellID, amount})
+                end
+            end
+
+            -- handle pet
+            for _, petName in ipairs(Actor.pets) do
+                local petActor = Container:GetActor(petName)
+                for spellID, spellTable in pairs(petActor:GetSpellList()) do
+                    local amount = spellTable.targets[orbName]
+                    if amount then
+                        tinsert(sortedList, {spellID, amount, petName})
+                    end
+                end
+            end
+
+            sort(sortedList, Details.Sort2)
+
+            local format_func = Details:GetCurrentToKFunction()
+            for _, tbl in ipairs(sortedList) do
+                local spellID, amount, petName = unpack(tbl)
+                local spellName, _, spellIcon = Details.GetSpellInfo(spellID)
+                if petName then
+                    spellName = spellName .. ' (' .. petName .. ')'
+                end
+
+                GameCooltip:AddLine(spellName, format_func(_, amount))
+                Details:AddTooltipBackgroundStatusbar()
+                GameCooltip:AddIcon(spellIcon, 1, 1, _detalhes.tooltip.line_height, _detalhes.tooltip.line_height)
+            end
+        end
+    ]],
+    total_script = [[
+        local value, top, total, Combat, Instance, Actor = ...
+
+        if _G.Details_ExplosiveOrbs then
+            return _G.Details_ExplosiveOrbs:GetDisplayTextHit(Combat:GetCombatNumber(), Actor.my_actor:guid())
+        end
+        return ""
+    ]],
+}
 
 -- Public APIs
 
@@ -258,6 +436,20 @@ function Engine:GetDisplayText(combatID, playerGUID)
         return L["Target: "] .. (EO.db[combatID][playerGUID].target or 0) .. " " .. L["Hit: "] .. (EO.db[combatID][playerGUID].hit or 0)
     end
     return L["Target: "] .. "0 " .. L["Hit: "] .. "0"
+end
+
+function Engine:GetDisplayTextNumbers(combatID, playerGUID)
+    if EO.db[combatID] and EO.db[combatID][playerGUID] then
+        return (EO.db[combatID][playerGUID].target or 0) .. " | " .. (EO.db[combatID][playerGUID].hit or 0)
+    end
+    return "0 " .. " | " .. "0"
+end
+
+function Engine:GetDisplayTextHit(combatID, playerGUID)
+    if EO.db[combatID] and EO.db[combatID][playerGUID] then
+        return L["Hit: "] .. (EO.db[combatID][playerGUID].hit or 0)
+    end
+    return L["Hit: "] .. "0"
 end
 
 function Engine:FormatDisplayText(target, hit)
@@ -563,6 +755,8 @@ function EO:LoadHooks()
 
     Details:InstallCustomObject(self.CustomDisplay)
     Details:InstallCustomObject(self.CustomDisplayOverall)
+    Details:InstallCustomObject(self.CustomDisplayNumbers)
+    Details:InstallCustomObject(self.CustomDisplayHit)
     self:CleanDiscardCombat()
 end
 
