@@ -14,6 +14,7 @@ local bit_band = bit.band
 local C_ChallengeMode_GetActiveKeystoneInfo = C_ChallengeMode.GetActiveKeystoneInfo
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local CreateFrame = CreateFrame
+local GetAddOnMetadata = GetAddOnMetadata
 local UnitGUID = UnitGUID
 
 local tContains = tContains
