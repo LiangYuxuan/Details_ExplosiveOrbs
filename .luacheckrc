@@ -41915,6 +41915,7 @@ read_globals = {
 	"LFGListUtil_ValidatePvPLevelReq",
 	"LFGListUtil_ValidatePvpRatingReq",
 	"LFGList_DefaultFilterFunction",
+	"LFGList_ReportAdvertisement",
 	"LFGList_ReportApplicant",
 	"LFGList_ReportListing",
 	"LFGLockList",
