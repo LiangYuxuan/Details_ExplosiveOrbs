@@ -45479,6 +45479,7 @@ read_globals = {
 	"PvPTalentSlotTrayMixin",
 	"PvpCellNameDropDown_OnLoad",
 	"PvpRoleButtonWithCountMixin",
+	"PvpRolelessButtonMixin",
 	"PvpTalentButtonMixin",
 	"PvpTalentExpandingButtonMixin",
 	"PvpTalentFrameMixin",
