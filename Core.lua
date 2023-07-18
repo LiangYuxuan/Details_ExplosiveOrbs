@@ -433,7 +433,7 @@ function EO:MergeSegmentsOnEnd()
     local overallCombat = Details:GetCombat(1)
     local overall = overallCombat:GetCombatNumber()
     local runID = select(2, overallCombat:IsMythicDungeon())
-    for i = 2, 25 do
+    for i = 2, 40 do
         local combat = Details:GetCombat(i)
         if not combat then break end
 
@@ -520,7 +520,7 @@ function EO:CleanDiscardCombat()
     local remain = {}
     remain[self.overall] = true
 
-    for i = 1, 25 do
+    for i = 1, 40 do
         local combat = Details:GetCombat(i)
         if not combat then break end
 
