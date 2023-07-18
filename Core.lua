@@ -507,15 +507,6 @@ function EO:MergeRemainingTrashAfterAllBossesDone()
     self:CleanDiscardCombat()
 end
 
-function EO:OnResetOverall()
-    self:Debug("on Details Reset Overall")
-
-    if self.overall and self.db[self.overall] then
-        self.db[self.overall] = nil
-    end
-    self.overall = Details:GetCombat(-1):GetCombatNumber()
-end
-
 function EO:CleanDiscardCombat()
     local remain = {}
     remain[self.overall] = true
@@ -556,6 +547,10 @@ function EO:OnDetailsEvent(event, combat)
         EO:Debug("DETAILS_DATA_RESET")
         EO.overall = Details:GetCombat(-1):GetCombatNumber()
         EO:CleanDiscardCombat()
+    elseif event == 'DETAILS_DATA_SEGMENTREMOVED' then
+        EO:Debug("DETAILS_DATA_SEGMENTREMOVED")
+        EO.overall = Details:GetCombat(-1):GetCombatNumber()
+        EO:CleanDiscardCombat()
     end
 end
 
@@ -564,7 +559,6 @@ function EO:LoadHooks()
     self:SecureHook(_G.DetailsMythicPlusFrame, 'MergeTrashCleanup')
     self:SecureHook(_G.DetailsMythicPlusFrame, 'MergeRemainingTrashAfterAllBossesDone')
 
-    self:SecureHook(Details.historico, 'resetar_overall', 'OnResetOverall')
     self.overall = Details:GetCombat(-1):GetCombatNumber()
 
     Details:InstallCustomObject(self.CustomDisplay)
@@ -651,6 +645,7 @@ do
         Details:RegisterEvent(plugin, 'COMBAT_PLAYER_ENTER')
         Details:RegisterEvent(plugin, 'COMBAT_PLAYER_LEAVE')
         Details:RegisterEvent(plugin, 'DETAILS_DATA_RESET')
+        Details:RegisterEvent(plugin, 'DETAILS_DATA_SEGMENTREMOVED')
     end
 end
 
