@@ -14,7 +14,7 @@ local bit_band = bit.band
 local C_ChallengeMode_GetActiveKeystoneInfo = C_ChallengeMode.GetActiveKeystoneInfo
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local CreateFrame = CreateFrame
-local GetAddOnMetadata = GetAddOnMetadata
+local C_AddOns_GetAddOnMetadata = C_AddOns.GetAddOnMetadata
 local UnitGUID = UnitGUID
 
 local tContains = tContains
@@ -629,7 +629,7 @@ do
     end
 
     function EO:InstallPlugin()
-        local version = GetAddOnMetadata(addon, 'Version')
+        local version = C_AddOns_GetAddOnMetadata(addon, 'Version')
 
         plugin = Details:NewPluginObject('Details_ExplosiveOrbs', _G.DETAILSPLUGIN_ALWAYSENABLED)
         plugin.OpenOptionsPanel = OpenOptionsPanel
