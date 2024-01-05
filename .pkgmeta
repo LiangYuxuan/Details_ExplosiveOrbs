@@ -5,6 +5,5 @@ externals:
   Libs/AceHook-3.0: https://repos.wowace.com/wow/ace3/trunk/AceHook-3.0
 
 ignore:
-  - .luacheckrc
   - babelfish_config.lua
   - README.md
