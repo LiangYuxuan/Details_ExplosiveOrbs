@@ -1,4 +1,4 @@
-## Interface: 100200
+## Interface: 100205
 ## Title: Details!: Explosive Orbs (plugin)
 ## Title-ruRU: Details!: Взрывоопасные сферы (плагин)
 ## Notes: Show how many explosive orbs players target and hit.
