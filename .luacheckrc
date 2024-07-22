@@ -92,6 +92,7 @@ read_globals = {
 	"ChatFrame3Tab",
 	"ChatFrame4",
 	"ChatFrame4EditBox",
+	"ChatFrame4Tab",
 	"ChatFrame5",
 	"ChatFrame5EditBox",
 	"ChatFrame5Tab",
