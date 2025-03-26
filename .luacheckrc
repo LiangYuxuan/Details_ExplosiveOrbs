@@ -46983,6 +46983,7 @@ read_globals = {
 	"GetIsPVPInactive",
 	"GetItemButtonBackgroundTexture",
 	"GetItemButtonCount",
+	"GetItemButtonIconTexture",
 	"GetItemInfoFromHyperlink",
 	"GetKeysArray",
 	"GetKeysArraySortedByValue",
